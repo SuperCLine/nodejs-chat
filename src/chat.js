@@ -31,6 +31,7 @@ var chat = {
 
             ws.on('close', function() {
                 console.log("close");
+                chat.removeSession(ws)
             });
 
             ws.on('pong', function() {
@@ -149,9 +150,9 @@ var chat = {
     OnStats: function(ws, msg) {
 
         chat.sessions.forEach((session) => {
-            if (msg.id === session.id) {
+            if (msg.id === session.id || msg.nickname === session.nickname) {
 
-                var jsonTime = { time: util.formatTime(Date.now() - session.time) };
+                var jsonTime = { cmd: '/stats', time: util.formatTime(Date.now() - session.time) };
                 ws.send(JSON.stringify(jsonTime));
             }
         })

@@ -1,64 +1,129 @@
 const WebSocket = require('ws');
 const ws = new WebSocket('ws://127.0.0.1:8090');
+const inquirer = require('inquirer');
+
+var clientID = 0
 
 ws.on('open', function open() {
     console.log('connected');
-    // ws.send(Date.now());
-    // heartbeat();
-
-    var data = { cmd: '/sayHello', nickname: 'cline', defaultChannel: 'world', channelPwd: 'hello world' };
-    var jsonData = JSON.stringify(data);
-    ws.send(jsonData);
-
-
-    // var data1 = { cmd: '/chat', channel: 'world', data: 'xxxhello world test!' };
-    var data1 = { cmd: '/chat', channel: 'world', data: 'finish game work!' };
-    var jsonData1 = JSON.stringify(data1);
-    ws.send(jsonData1);
-
 });
 
 ws.on('close', function close() {
     console.log('disconnected');
-    clearTimeout(this.pingTimeout);
 });
 
 ws.on('ping', function ping() {
     console.log('ping');
-    heartbeat();
 });
 
-ws.on('message', function incoming(data) {
-    // console.log(`Roundtrip time: ${Date.now() - data} ms`);
+ws.on('message', function incoming(msg) {
 
-    // setTimeout(function timeout() {
-    //     // ws.send(Date.now());
-    //     var data = { cmd: '/sayHello', defaultChannel: 'world', channelPwd: 'hello world' };
-    //     var jsonData = JSON.stringify(data);
-    //     ws.send(jsonData);
-    // }, 500);
+    var jsonMsg = null
+    try {
+        jsonMsg = JSON.parse(msg)
 
-    console.log(data);
+        if (jsonMsg == null || jsonMsg == undefined || jsonMsg == '') {
+            return
+        }
 
-    // var msg = JSON.parse(data);
+        if (jsonMsg.cmd.indexOf('/') != 0) {
+            return
+        }
+    } catch (e) {
+        console.log(e)
+    }
 
-    // var data2 = { cmd: '/stats', id: msg.id };
-    // var jsonData2 = JSON.stringify(data2);
-    // ws.send(jsonData2);
+    // console.log(jsonMsg)
 
-
+    switch (jsonMsg.cmd) {
+        case '/sayHello':
+            {
+                clientID = jsonMsg.id
+                console.log("client id: " + clientID)
+                console.log(jsonMsg.data)
+                for (let i = 0; i < jsonMsg.data.length; ++i) {
+                    console.log(jsonMsg.data[i])
+                }
+                // console.log("Enter chat message:")
+            }
+            break;
+        case '/chat':
+            {
+                console.log(jsonMsg.data)
+            }
+            break;
+        case '/stats':
+            {
+                console.log(jsonMsg.time)
+            }
+            break;
+        default:
+            console.log("default" + jsonMsg)
+            break;
+    }
 });
 
-function heartbeat() {
-    clearTimeout(this.pingTimeout);
-    console.log("heartbeat")
+const run = async() => {
+    const { name } = await askName();
 
-    // Use `WebSocket#terminate()`, which immediately destroys the connection,
-    // instead of `WebSocket#close()`, which waits for the close timer.
-    // Delay should be equal to the interval at which your server
-    // sends out pings plus a conservative assumption of the latency.
-    this.pingTimeout = setTimeout(() => {
-        console.log("terminate");
-        ws.terminate();
-    }, 1000);
-}
+    var data = { cmd: '/sayHello', nickname: name, defaultChannel: 'world', channelPwd: 'hello world' };
+    var jsonData = JSON.stringify(data);
+    ws.send(jsonData);
+
+    while (true) {
+        const answers = await askChat();
+        const { message } = answers;
+
+        console.log(message)
+        var arr = message.split(" ");
+        try {
+            if (arr[0].indexOf('/') === 0) {
+                switch (arr[0]) {
+                    case '/chat':
+                        {
+                            var ms = message.substr(arr[0].length + 1, message.length)
+                                // console.log("-----" + ms)
+                            var data1 = { cmd: '/chat', channel: 'world', data: ms };
+                            var jsonData1 = JSON.stringify(data1);
+                            ws.send(jsonData1);
+                        }
+                        break;
+                    case '/popular':
+                        break
+                    case '/stats':
+                        {
+                            var ms = message.substr(arr[0].length + 1, message.length)
+                            var data2 = { cmd: '/stats', id: 0, nickname: ms };
+                            var jsonData2 = JSON.stringify(data2);
+                            ws.send(jsonData2);
+                        }
+                        break
+                    default:
+                        break;
+                }
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+};
+
+const askChat = () => {
+    const questions = [{
+        name: "message",
+        type: "input",
+        message: "Enter chat message:"
+    }];
+    return inquirer.prompt(questions);
+};
+
+const askName = () => {
+    const questions = [{
+        name: "name",
+        type: "input",
+        message: "Enter your name:"
+    }];
+    return inquirer.prompt(questions);
+};
+
+run()

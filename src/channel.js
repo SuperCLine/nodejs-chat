@@ -54,8 +54,9 @@ var channel = function() {
             this.messages.remove();
         }
 
+        var chatMsg = { cmd: '/chat', data: jsonMsg }
         this.sessions.forEach((session) => {
-            session.socket.send(jsonMsg);
+            session.socket.send(JSON.stringify(chatMsg));
         });
     };
 
@@ -66,7 +67,7 @@ var channel = function() {
             msgs.push(m.message);
         });
 
-        var jsonHello = { id: session.id, data: msgs.toString() };
+        var jsonHello = { cmd: '/sayHello', id: session.id, data: msgs };
         session.socket.send(JSON.stringify(jsonHello));
     };
 

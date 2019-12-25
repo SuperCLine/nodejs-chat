@@ -1,5 +1,16 @@
 # design
-a chat server contain many named room channel, extension to world channel or pernal channel
+a chat server contain many named room channel, extension to world channel or personal channel
+
+# run server
+    node index.js
+
+# run client
+    node ./test/client.js
+
+# cmd
+    /chat [content]
+    /stats [nickname]
+    /popular
 
 # npm
 ### for websocket
@@ -12,6 +23,8 @@ a chat server contain many named room channel, extension to world channel or per
     npm install hashmap --save
 ### linked list
     npm install singly-linked-list --save
+### client
+    npm install inquirer --save
 
 # later
 - add Popular

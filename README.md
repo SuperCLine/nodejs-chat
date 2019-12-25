@@ -14,7 +14,7 @@ a chat server contain many named room channel, extension to world channel or per
     npm install singly-linked-list --save
 
 # later
-add Popular
-add message crypto
-add message compress
-add chat config
+- add Popular
+- add message crypto
+- add message compress
+- add chat config

@@ -26,7 +26,12 @@ module.exports.formatTime = function(t) {
     var m = Math.floor(t / 60)
     t = t - m * 60
 
-    var st = d.toString() + "d "
+    var st = ""
+    if (d < 10) {
+        st = "0"
+    }
+    st = st + d.toString() + "d "
+
     if (h < 10) {
         st = st + "0"
     }
@@ -43,4 +48,8 @@ module.exports.formatTime = function(t) {
     st = st + t.toString() + "s"
 
     return st
+};
+
+module.exports.timeUnix = function() {
+    return Math.round(new Date().getTime() / 1000);
 };

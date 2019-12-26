@@ -74,16 +74,16 @@ const run = async() => {
         const answers = await askChat();
         const { message } = answers;
 
-        console.log(message)
+        // console.log(message)
         var arr = message.split(" ");
         try {
             if (arr[0].indexOf('/') === 0) {
                 switch (arr[0]) {
                     case '/chat':
                         {
-                            var ms = message.substr(arr[0].length + 1, message.length)
+                            var ms = message.substr(arr[0].length, message.length)
                                 // console.log("-----" + ms)
-                            var data1 = { cmd: '/chat', channel: 'world', data: ms };
+                            var data1 = { cmd: '/chat', channel: 'world', data: ms.trim() };
                             var jsonData1 = JSON.stringify(data1);
                             ws.send(jsonData1);
                         }
@@ -92,8 +92,8 @@ const run = async() => {
                         break
                     case '/stats':
                         {
-                            var ms = message.substr(arr[0].length + 1, message.length)
-                            var data2 = { cmd: '/stats', id: 0, nickname: ms };
+                            var ms = message.substr(arr[0].length, message.length)
+                            var data2 = { cmd: '/stats', id: 0, nickname: ms.trim() };
                             var jsonData2 = JSON.stringify(data2);
                             ws.send(jsonData2);
                         }
@@ -101,6 +101,11 @@ const run = async() => {
                     default:
                         break;
                 }
+            } else {
+
+                var data1 = { cmd: '/chat', channel: 'world', data: message.trim() };
+                var jsonData1 = JSON.stringify(data1);
+                ws.send(jsonData1);
             }
         } catch (e) {
             console.log(e)

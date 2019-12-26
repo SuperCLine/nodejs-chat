@@ -47,7 +47,7 @@ var channel = function() {
         }
 
         var jsonMsg = JSON.stringify(msg);
-        var timeMsg = { time: Date.now(), message: jsonMsg };
+        var timeMsg = { time: util.timeUnix(), message: jsonMsg };
         this.messages.insertFirst(timeMsg);
 
         if (this.messages.getSize() > this.max) {
@@ -64,7 +64,7 @@ var channel = function() {
 
         var msgs = new Array;
         this.messages.forEach((m) => {
-            msgs.push(m.message);
+            msgs.push(m.data.message);
         });
 
         var jsonHello = { cmd: '/sayHello', id: session.id, data: msgs };
@@ -76,7 +76,7 @@ var channel = function() {
         var msgs = new Array;
         this.messages.forEach((m) => {
 
-            var t = Date.now() - m.time
+            var t = util.timeUnix() - m.time
             if (t >= 5) {
 
                 msgs.push(JSON.parse(m.message));

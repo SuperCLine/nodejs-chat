@@ -48,7 +48,7 @@ var chat = {
 
     addSession: function(ws, name) {
 
-        var session = { socket: ws, id: chat.autoId(), nickname: name, time: Date.now() };
+        var session = { socket: ws, id: chat.autoId(), nickname: name, time: util.timeUnix() };
         chat.sessions.set(session.socket, session);
 
         // console.log(session);
@@ -152,7 +152,7 @@ var chat = {
         chat.sessions.forEach((session) => {
             if (msg.id === session.id || msg.nickname === session.nickname) {
 
-                var jsonTime = { cmd: '/stats', time: util.formatTime(Date.now() - session.time) };
+                var jsonTime = { cmd: '/stats', time: util.formatTime(util.timeUnix() - session.time) };
                 ws.send(JSON.stringify(jsonTime));
             }
         })
